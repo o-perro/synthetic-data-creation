@@ -37,9 +37,9 @@ class Customer(BaseModel):
     first_name: str
     last_name: str
     date_of_birth: date
-    ssn_last4: str = Field(
-        pattern=r"^\d{4}$",
-        description="Last 4 digits of SSN only — never store full SSN in test data",
+    ssn: str = Field(
+        pattern=r"^\d{3}-\d{2}-\d{4}$",
+        description="Full synthetic SSN in XXX-XX-XXXX format — Faker-generated, not a real number",
     )
     email: EmailStr
     phone: str = Field(pattern=r"^\d{3}-\d{3}-\d{4}$", description="Format: 555-867-5309")

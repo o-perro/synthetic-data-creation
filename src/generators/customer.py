@@ -1,9 +1,10 @@
-"""Customer (CIF) data generator using Faker."""
+"""Customer (CIF) data generator using Faker and uszipcode."""
 
 import logging
 from datetime import date, timedelta
 from random import Random
 
+import zipcodes
 from faker import Faker
 
 from src.models.customer import (
@@ -14,6 +15,17 @@ from src.models.customer import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Build zip code pool once at module level from the bundled zipcodes dataset.
+# We filter to STANDARD type only — exclude PO Box and unique zip codes which
+# would produce addresses that look odd on a customer record.
+_ZIP_POOL: list[dict[str, str]] = [
+    z for z in zipcodes.list_all() if z["zip_code_type"] == "STANDARD"
+]
+
+# Typed enum lists — rng.choice() returns str for StrEnum without explicit annotations
+_EMPLOYMENT_STATUSES: list[EmploymentStatus] = list(EmploymentStatus)
+_MARITAL_STATUSES: list[MaritalStatus] = list(MaritalStatus)
 
 
 def generate_customers(count: int, seed: int, start_index: int = 1) -> list[Customer]:
@@ -37,33 +49,36 @@ def generate_customers(count: int, seed: int, start_index: int = 1) -> list[Cust
     for i in range(count):
         cif_id = f"CIF-{start_index + i:06d}"
 
-        # Age range 18–85; skew slightly younger to reflect active banking population
+        # Age range 18–85; uniform distribution across active banking population
         age_days = rng.randint(18 * 365, 85 * 365)
         dob = date.today() - timedelta(days=age_days)
 
-        # Employment status influences income range
-        employment = rng.choice(list(EmploymentStatus))
+        # Employment status is picked first so income range reflects it
+        employment: EmploymentStatus = rng.choice(_EMPLOYMENT_STATUSES)
         annual_income = _income_for_employment(employment, rng)
 
         # customer_since: anywhere from 1 to 20 years ago
         years_as_customer = rng.randint(1, 20)
         customer_since = date.today() - timedelta(days=years_as_customer * 365)
 
+        # Pull a real zip entry so city, state, and zip are geographically consistent
+        zip_entry = rng.choice(_ZIP_POOL)
+
         customer = Customer(
             customer_id=cif_id,
             first_name=faker.first_name(),
             last_name=faker.last_name(),
             date_of_birth=dob,
-            ssn_last4=f"{rng.randint(0, 9999):04d}",
+            ssn=faker.ssn(),
             email=faker.email(),
             phone=faker.numerify("###-###-####"),
             address=Address(
                 street=faker.street_address(),
-                city=faker.city(),
-                state=faker.state_abbr(),
-                zip_code=faker.zipcode()[:5],
+                city=zip_entry["city"],
+                state=zip_entry["state"],
+                zip_code=zip_entry["zip_code"],
             ),
-            marital_status=rng.choice(list(MaritalStatus)),
+            marital_status=rng.choice(_MARITAL_STATUSES),
             employment_status=employment,
             annual_income=annual_income,
             customer_since=customer_since,
@@ -84,6 +99,6 @@ def _income_for_employment(status: EmploymentStatus, rng: Random) -> float:
         EmploymentStatus.STUDENT: (0, 20_000),
     }
     low, high = ranges[status]
-    # Round to nearest $500 for realism
+    # Round to nearest $500 — looks like a self-reported figure, not a raw float
     raw = rng.uniform(low, high)
     return round(raw / 500) * 500
