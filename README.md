@@ -79,6 +79,7 @@ uv run jupyter lab
 |----------|-------------|
 | `01_customer_analysis.ipynb` | Customer generator walkthrough — age, employment, income, marital status, geographic spread, and tenure distributions |
 | `02_account_analysis.ipynb` | Account generator walkthrough — type mix, accounts per customer, balance and interest rate distributions, CD term breakdown |
+| `03_transaction_analysis.ipynb` | Transaction generator walkthrough — code mix by account type, debit/credit split, amount distributions, merchant categories, volume over time, running balance trends |
 
 > **Kernel:** Select **Python (synthetic-data-creation)** when opening a notebook for the first time.
 
