@@ -33,11 +33,12 @@ Every account belongs to exactly one customer. Every transaction belongs to exac
 | `scripts/generate.py` | Typer CLI entry point — what teams run |
 
 ### Notebooks
-| Notebook | Description |
-|----------|-------------|
-| `notebooks/01_customer_analysis.ipynb` | Customer generator walkthrough and distribution analysis |
-| `notebooks/02_account_analysis.ipynb` | Account generator walkthrough — type mix, balances, interest rates, CD terms |
-| `notebooks/03_transaction_analysis.ipynb` | Transaction generator walkthrough — code mix, amounts, merchants, volume over time, running balance trends |
+| Notebook | Status | Description |
+|----------|--------|-------------|
+| `notebooks/01_customer_analysis.ipynb` | ✅ Complete | Customer generator walkthrough and distribution analysis |
+| `notebooks/02_account_analysis.ipynb` | ✅ Complete | Account generator walkthrough — type mix, balances, interest rates, CD terms |
+| `notebooks/03_transaction_analysis.ipynb` | ✅ Complete | Transaction generator walkthrough — code mix, amounts, merchants, volume over time, running balance trends |
+| `notebooks/04_full_pipeline.ipynb` | 🔜 Next | Combined pipeline — generates all three entities, produces joined views (customer + account + transaction), and exports the complete dataset in one shot |
 
 Run notebooks with: `uv run jupyter lab`. Select the **Python (synthetic-data-creation)** kernel.
 
