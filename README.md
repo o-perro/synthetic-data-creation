@@ -10,7 +10,7 @@ A Python-based tool for generating realistic synthetic banking data for UAT (Use
 
 | Entity | Description | Default Volume |
 |--------|-------------|---------------|
-| **Customers (CIF)** | Name, DOB, SSN last 4, contact info, employment, income | 250 |
+| **Customers (CIF)** | Name, DOB, full SSN, contact info, employment, income — geographically consistent addresses | 250 |
 | **Accounts** | Checking, Savings, and CD accounts linked to customers | 450 |
 | **Transactions** | Debits and credits per account type with realistic patterns | 7,500 |
 
@@ -64,6 +64,23 @@ data/outputs/
 ├── accounts.json
 └── transactions.json
 ```
+
+---
+
+## Jupyter Notebooks
+
+The `notebooks/` directory contains analysis notebooks that walk through each generator and visualize the output distributions. Run these to validate the data looks realistic before loading into Snowflake.
+
+```bash
+uv run jupyter lab
+```
+
+| Notebook | Description |
+|----------|-------------|
+| `01_customer_analysis.ipynb` | Customer generator walkthrough — age, employment, income, marital status, geographic spread, and tenure distributions |
+| `02_account_analysis.ipynb` | Account generator walkthrough — type mix, accounts per customer, balance and interest rate distributions, CD term breakdown |
+
+> **Kernel:** Select **Python (synthetic-data-creation)** when opening a notebook for the first time.
 
 ---
 

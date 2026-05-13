@@ -25,12 +25,20 @@ Every account belongs to exactly one customer. Every transaction belongs to exac
 | Module | Responsibility |
 |--------|---------------|
 | `src/models/` | Pydantic v2 schemas — the single source of truth for every field |
-| `src/generators/customer.py` | Faker-based CIF generation |
-| `src/generators/accounts.py` | Account generation with realistic account number formats |
+| `src/generators/customer.py` | Faker + zipcodes-based CIF generation; full SSN, geographically consistent addresses |
+| `src/generators/accounts.py` | Account generation with type weighting and guaranteed Checking per customer |
 | `src/generators/transactions.py` | Rule-based transaction generation (numpy distributions) |
 | `src/config/settings.py` | Pydantic BaseSettings — volume config, seed, output path |
 | `src/utils/exporters.py` | JSON and CSV writers, Snowflake-compatible |
 | `scripts/generate.py` | Typer CLI entry point — what teams run |
+
+### Notebooks
+| Notebook | Description |
+|----------|-------------|
+| `notebooks/01_customer_analysis.ipynb` | Customer generator walkthrough and distribution analysis |
+| `notebooks/02_account_analysis.ipynb` | Account generator walkthrough — type mix, balances, interest rates, CD terms |
+
+Run notebooks with: `uv run jupyter lab`. Select the **Python (synthetic-data-creation)** kernel.
 
 ### Transaction generation approach
 Transactions are rule-based (not SDV) because no real bank data is available. Each account type has its own pattern:
@@ -70,3 +78,6 @@ COPY INTO my_table FROM @my_stage/customers.csv FILE_FORMAT = (TYPE = 'CSV' SKIP
 - **No SDV:** SDV requires real data as a training input. Without it, rule-based generation gives more control and is the right approach for UAT.
 - **No card data:** Bank is not PCI compliant — no debit/credit PAN, CVV, or card numbers anywhere in the output.
 - **Seeded runs:** Pass `--seed` to reproduce the exact same dataset. Useful for regression testing.
+- **Full SSN:** Faker generates realistic but entirely synthetic SSNs — safe for UAT, no real numbers used.
+- **Geographic address consistency:** `zipcodes` library ensures city, state, and zip always match — avoids tester distraction from obviously wrong addresses. (`uszipcode` was evaluated but had SQLAlchemy compatibility issues.)
+- **Accounts not joined to customers at generation time:** Output files are separate (like database tables). Join them in pandas or Snowflake on `customer_id` when a merged view is needed.
