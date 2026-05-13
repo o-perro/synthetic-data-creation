@@ -45,7 +45,6 @@ coverage.xml
 .LSOverride
 
 # IDEs
-.vscode/
 .idea/
 *.code-workspace
 
