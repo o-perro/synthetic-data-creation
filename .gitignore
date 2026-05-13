@@ -44,6 +44,9 @@ coverage.xml
 .AppleDouble
 .LSOverride
 
+# Claude Code local memory — not part of the project
+.claude/
+
 # IDEs
 .idea/
 *.code-workspace
