@@ -28,10 +28,12 @@ class TestGenerateCustomers:
             assert len(c.customer_id) == 10  # "CIF-" + 6 digits
 
     def test_ssn_last4_is_digits(self) -> None:
+        import re
+
         customers = generate_customers(count=20, seed=42)
+        pattern = re.compile(r"^\d{3}-\d{2}-\d{4}$")
         for c in customers:
-            assert c.ssn_last4.isdigit()
-            assert len(c.ssn_last4) == 4
+            assert pattern.match(c.ssn), f"SSN '{c.ssn}' does not match XXX-XX-XXXX format"
 
     def test_reproducible_with_same_seed(self) -> None:
         batch_a = generate_customers(count=10, seed=99)
